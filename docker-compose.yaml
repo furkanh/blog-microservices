@@ -1,0 +1,23 @@
+version: '3'
+services:
+  postgres-service:
+    image: postgres
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+  posts-service:
+    build: posts
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+      - RABBITMQ_USERNAME=username
+      - RABBITMQ_PASSWORD=password
+  rabbitmq-service:
+    image: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=username
+      - RABBITMQ_DEFAULT_PASS=password
