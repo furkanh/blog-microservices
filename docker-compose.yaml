@@ -1,6 +1,12 @@
 version: '3'
 services:
-  postgres-service:
+  posts-postgres-service:
+    image: postgres
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+  comments-postgres-service:
     image: postgres
     environment:
       - POSTGRES_USER=username
@@ -14,10 +20,33 @@ services:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=postgres
-      - RABBITMQ_USERNAME=username
-      - RABBITMQ_PASSWORD=password
-  rabbitmq-service:
-    image: rabbitmq
+      - ACTIVE_PROFILE=prod
+      - POSTGRES_URI=posts-postgres-service:5432
+      - KAFKA_BOOTSTRAP_SERVERS=http://kafka:9092
+    depends_on:
+      - posts-postgres-service
+      - kafka
+  comments-service:
+    build: comments
+    ports:
+      - "8081:8080"
     environment:
-      - RABBITMQ_DEFAULT_USER=username
-      - RABBITMQ_DEFAULT_PASS=password
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+      - ACTIVE_PROFILE=prod
+    depends_on:
+      - comments-postgres-service
+      - kafka
+  zookeeper:
+    image: wurstmeister/zookeeper
+  kafka:
+    image: wurstmeister/kafka
+    environment:
+      KAFKA_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper

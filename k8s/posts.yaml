@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts 
+  template:
+    metadata:
+      labels:
+        app: posts 
+    spec:
+      containers:
+        - name: posts 
+          image: furkanh/blog-posts
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: posts-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres 
+            - name: POSTGRES_URI
+              value: posts-postgres-service:5432
+            - name: ACTIVE_PROFILE
+              value: prod
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: http://kafka-1-service:30322
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-service
+spec:
+  type: ClusterIP
+  selector:
+    app: posts 
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts-postgres 
+  template:
+    metadata:
+      labels:
+        app: posts-postgres
+    spec:
+      containers:
+        - name: posts-postgres
+          image: postgres
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: posts-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-postgres-service
+spec:
+  type: ClusterIP
+  selector:
+    app: posts-postgres 
+  ports:
+    - name: posts-postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432

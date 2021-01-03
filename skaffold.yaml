@@ -1,0 +1,34 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: furkanh/blog-posts
+      context: posts 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.java'
+            dest: .
+    - image: furkanh/blog-comments
+      context: comments 
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: 'src/**/*.java'
+            dest: .
+    - image: furkanh/blog-feed
+      context: feed 
+      docker:
+        dockerfile: Dockerfile 
+      sync:
+        manual:
+          - src: 'src/**/*.java'
+            dest: .

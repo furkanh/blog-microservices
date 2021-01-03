@@ -9,14 +9,13 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.blog</groupId>
-	<artifactId>posts</artifactId>
+	<artifactId>feed</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>posts</name>
-	<description>Posts service</description>
+	<name>feed</name>
+	<description>Feed service</description>
 
 	<properties>
 		<java.version>11</java.version>
-		<spring-cloud.version>2020.0.0</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -32,10 +31,11 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -64,18 +64,6 @@
 		</dependency>
 	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<packaging>jar</packaging>
 	<build>
 		<finalName>service</finalName>
@@ -94,13 +82,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-	</repositories>
 
 </project>

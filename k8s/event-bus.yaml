@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper 
+  template:
+    metadata:
+      labels:
+        app: zookeeper 
+    spec:
+      containers:
+        - name: zookeeper 
+          image: wurstmeister/zookeeper
+          ports:
+          - containerPort: 2181
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+spec:
+  type: ClusterIP
+  selector:
+    app: zookeeper 
+  ports:
+    - name: zookeeper
+      protocol: TCP
+      port: 2181
+      targetPort: 2181
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-1-service
+spec:
+  type: NodePort
+  selector:
+    app: kafka-1
+  ports:
+    - name: kafka-1-inner
+      port: 9092
+      targetPort: 9092
+      protocol: TCP
+    - name: kafka-1-outer
+      port: 30322
+      targetPort: 30322
+      nodePort: 30322
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-1-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-1
+  template:
+    metadata:
+      labels:
+        app: kafka-1
+    spec:
+      containers:
+        - name: kafka-1
+          image: wurstmeister/kafka
+          env:
+            - name: KAFKA_LISTENERS
+              value: INSIDE://:9092,OUTSIDE://:30322
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: INSIDE://:9092,OUTSIDE://kafka-1-service:30322
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: INSIDE
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: zookeeper-service:2181
+            - name: KAFKA_BROKER_ID
+              value: "1"
