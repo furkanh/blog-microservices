@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feed-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feed 
+  template:
+    metadata:
+      labels:
+        app: feed 
+    spec:
+      containers:
+        - name: feed 
+          image: furkanh/blog-feed
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: feed-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres 
+            - name: POSTGRES_URI
+              value: feed-postgres-service:5432
+            - name: ACTIVE_PROFILE
+              value: prod
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: http://kafka-1-service:30322
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feed-service
+spec:
+  type: ClusterIP
+  selector:
+    app: feed 
+  ports:
+    - name: feed
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feed-postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feed-postgres 
+  template:
+    metadata:
+      labels:
+        app: feed-postgres
+    spec:
+      containers:
+        - name: feed-postgres
+          image: postgres
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: feed-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feed-postgres-service
+spec:
+  type: ClusterIP
+  selector:
+    app: feed-postgres 
+  ports:
+    - name: feed-postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432

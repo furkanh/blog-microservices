@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: ingress-service
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /api/posts/?(.*)
+            backend:
+              serviceName: posts-service
+              servicePort: 8080
+          - path: /api/comments/?(.*)
+            backend:
+              serviceName: comments-service
+              servicePort: 8080
+          - path: /api/feed/?(.*)
+            backend:
+              serviceName: feed-service
+              servicePort: 8080
