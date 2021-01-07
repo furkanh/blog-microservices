@@ -16,3 +16,5 @@ jobs:
       with:
         java-version: 11
     - run: cd posts && mvn clean test
+      env:
+        ACTIVE_PROFILE: test
