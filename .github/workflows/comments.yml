@@ -1,4 +1,4 @@
-name: posts-test
+name: comments-test
 
 on:
   pull_request:
@@ -12,6 +12,6 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: cd posts && mvn clean test
+    - run: cd comments && mvn clean test
       env:
-        ACTIVE_PROFILE: "test"
+        ACTIVE_PROFILE: test
