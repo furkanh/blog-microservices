@@ -14,4 +14,4 @@ jobs:
         java-version: 11
     - env:
         ACTIVE_PROFILE: test
-      run: mvn clean test -f ./posts/pom.xml
+      run: cd posts && mvn clean test
