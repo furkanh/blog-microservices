@@ -3,6 +3,7 @@ package com.blog.posts.controller;
 import com.blog.posts.config.KafkaTopicConfig;
 import com.blog.posts.dto.*;
 import com.blog.posts.exception.KafkaSendException;
+import com.blog.posts.exception.PostNotFoundException;
 import com.blog.posts.model.Post;
 import com.blog.posts.repository.PostRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,13 +34,14 @@ public class PostController {
     @Autowired
     private PostRepository postRepository;
 
-    // TODO add pagination
-    @GetMapping("/api/posts")
-    public List<PostDTO> getPosts() {
+    @GetMapping("/api/posts/{id}")
+    public PostDTO getPost(@PathVariable String id) {
+        Optional<Post> postOptional = postRepository.findById(Long.parseLong(id));
+        if (!postOptional.isPresent()) {
+            throw new PostNotFoundException();
+        }
         ModelMapper modelMapper = new ModelMapper();
-        return postRepository.findAll()
-                .stream().map(item -> modelMapper.map(item, PostDTO.class))
-                .collect(Collectors.toList());
+        return modelMapper.map(postOptional.get(), PostDTO.class);
     }
 
     @Transactional
@@ -68,11 +70,11 @@ public class PostController {
 
     @Transactional
     @PutMapping("/api/posts/{id}")
-    public PostUpdateDTO updatePost(@RequestBody PostUpdateDTO postUpdateDTO, @PathVariable String id)
-            throws NotFoundException, JsonProcessingException {
+    public PostUpdateDTO updatePost(@RequestBody @Valid PostUpdateDTO postUpdateDTO, @PathVariable String id)
+            throws JsonProcessingException {
         Optional<Post> postOptional = postRepository.findById(Long.parseLong(id));
         if (!postOptional.isPresent()) {
-            throw new NotFoundException(String.format("Post with id=%s is not found", id));
+            throw new PostNotFoundException();
         }
         Post post = new ModelMapper().map(postUpdateDTO, Post.class);
         post.setId(Long.parseLong(id));
@@ -97,7 +99,11 @@ public class PostController {
     @DeleteMapping("/api/posts/{id}")
     public PostDeleteDTO deletePost(@PathVariable String id)
             throws JsonProcessingException {
-        Post post = postRepository.getOne(Long.parseLong(id));
+        Optional<Post> postOptional = postRepository.findById(Long.parseLong(id));
+        if (!postOptional.isPresent()) {
+            throw new PostNotFoundException();
+        }
+        Post post = postOptional.get();
         postRepository.deleteById(Long.parseLong(id));
         PostDeleteDTO postDeleteDTO = new ModelMapper().map(post, PostDeleteDTO.class);
         PostEventDTO postEventDTO = new ModelMapper().map(postDeleteDTO, PostEventDTO.class);
