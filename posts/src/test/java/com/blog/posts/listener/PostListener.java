@@ -1,12 +1,9 @@
 package com.blog.posts.listener;
 
 import lombok.Data;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.concurrent.CountDownLatch;
 

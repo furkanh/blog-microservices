@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @EmbeddedKafka(
         partitions = 1,
         brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" }
@@ -267,7 +267,7 @@ class PostControllerTests {
         assertEquals(postRepository.count(), 0);
         PostDeleteDTO postDeleteDTO = new ObjectMapper().readValue(response, PostDeleteDTO.class);
         assertEquals(postDeleteDTO.getId(), 1L);
-        assertEquals(postRepository.findById(1L).isPresent(), false);
+        assertFalse(postRepository.findById(1L).isPresent());
     }
 
     @Test
@@ -298,8 +298,8 @@ class PostControllerTests {
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostDeleted");
         assertEquals(postEventDTO.getId(), 1L);
-        assertEquals(postEventDTO.getTitle(), null);
-        assertEquals(postEventDTO.getBody(), null);
+        assertNull(postEventDTO.getTitle());
+        assertNull(postEventDTO.getBody());
     }
 
 }
