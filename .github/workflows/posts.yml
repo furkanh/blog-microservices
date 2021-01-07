@@ -3,9 +3,6 @@ name: posts-test
 on:
   pull_request:
     branches: [ master ]
-     
-env:
-  ACTIVE_PROFILE: test
 
 jobs:
   build:
@@ -15,4 +12,4 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: cd posts && mvn clean test
+    - run: export ACTIVE_PROFILE=test && cd posts && mvn clean test
