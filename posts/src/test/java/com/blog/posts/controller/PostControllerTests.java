@@ -4,11 +4,9 @@ import com.blog.posts.dto.*;
 import com.blog.posts.listener.PostListener;
 import com.blog.posts.model.Post;
 import com.blog.posts.repository.PostRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,12 +16,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -121,7 +117,7 @@ class PostControllerTests {
                         .content(postJson)
         );
         assertEquals(postRepository.count(), 1);
-        postListener.getLatch().await(3, TimeUnit.SECONDS);
+        postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostCreated");
@@ -249,7 +245,7 @@ class PostControllerTests {
                 put("/api/posts/1").contentType(MediaType.APPLICATION_JSON)
                         .content(postJson)
         );
-        postListener.getLatch().await(3, TimeUnit.SECONDS);
+        postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostUpdated");
@@ -297,7 +293,7 @@ class PostControllerTests {
                 delete("/api/posts/1").contentType(MediaType.APPLICATION_JSON)
         );
         assertEquals(postRepository.count(), 0);
-        postListener.getLatch().await(3, TimeUnit.SECONDS);
+        postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostDeleted");
