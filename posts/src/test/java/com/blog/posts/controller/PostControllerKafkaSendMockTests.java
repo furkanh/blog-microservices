@@ -67,7 +67,7 @@ class PostControllerKafkaSendMockTests {
                         .content(postJson)
         ).andExpect(status().isInternalServerError());
         postListener.getLatch().await(3, TimeUnit.SECONDS);
-        assertEquals(postListener.getPayload(), null);
+        assertNull(postListener.getPayload());
         assertEquals(postRepository.count(), 0);
     }
 
@@ -88,7 +88,7 @@ class PostControllerKafkaSendMockTests {
                         .content(postJson)
         ).andExpect(status().isInternalServerError());
         postListener.getLatch().await(3, TimeUnit.SECONDS);
-        assertEquals(postListener.getPayload(), null);
+        assertNull(postListener.getPayload());
         post = postRepository.findById(1L).get();
         assertEquals(post.getId(), 1L);
         assertEquals(post.getTitle(), "post 1");
@@ -108,7 +108,7 @@ class PostControllerKafkaSendMockTests {
                 delete("/api/posts/1").contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isInternalServerError());
         postListener.getLatch().await(3, TimeUnit.SECONDS);
-        assertEquals(postListener.getPayload(), null);
+        assertNull(postListener.getPayload());
         post = postRepository.findById(1L).get();
         assertEquals(post.getId(), 1L);
         assertEquals(post.getTitle(), "post 1");

@@ -119,6 +119,7 @@ class PostControllerTests {
         assertEquals(postRepository.count(), 1);
         postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
+        assertNotNull(payload);
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostCreated");
         assertEquals(postEventDTO.getId(), 1L);
@@ -224,7 +225,7 @@ class PostControllerTests {
                         .content(postJson)
         ).andExpect(status().isBadRequest());
         Optional<Post> postOptional = postRepository.findById(1L);
-        assertEquals(postOptional.isPresent(), true);
+        assertTrue(postOptional.isPresent());
         post = postOptional.get();
         assertEquals(post.getId(), 1L);
         assertEquals(post.getTitle(), "post 1");
@@ -247,6 +248,7 @@ class PostControllerTests {
         );
         postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
+        assertNotNull(payload);
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostUpdated");
         assertEquals(postEventDTO.getId(), 1L);
@@ -295,6 +297,7 @@ class PostControllerTests {
         assertEquals(postRepository.count(), 0);
         postListener.getLatch().await(10, TimeUnit.SECONDS);
         String payload = postListener.getPayload();
+        assertNotNull(payload);
         PostEventDTO postEventDTO = new ObjectMapper().readValue(payload, PostEventDTO.class);
         assertEquals(postEventDTO.getEvent(), "PostDeleted");
         assertEquals(postEventDTO.getId(), 1L);
