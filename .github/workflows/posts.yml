@@ -15,7 +15,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pam.xml') }}
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - env:
         ACTIVE_PROFILE: test
