@@ -12,6 +12,6 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
-    - run: cd posts && mvn clean test
-      env:
-        ACTIVE_PROFILE: "test"
+    - env:
+        ACTIVE_PROFILE: test
+      run: cd posts && mvn verify

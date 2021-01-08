@@ -2,7 +2,9 @@ package com.blog.posts.controller;
 
 import com.blog.posts.exception.KafkaSendException;
 import com.blog.posts.listener.PostListener;
+import com.blog.posts.model.Post;
 import com.blog.posts.repository.PostRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -26,9 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -65,7 +67,51 @@ class PostControllerKafkaSendMockTests {
                         .content(postJson)
         ).andExpect(status().isInternalServerError());
         postListener.getLatch().await(3, TimeUnit.SECONDS);
-        assertEquals(postListener.getPayload(), null);
+        assertNull(postListener.getPayload());
         assertEquals(postRepository.count(), 0);
+    }
+
+    @Test
+    public void updatePost_doesNotSaveToDatabaseWhenItFailsToEmitKafkaEvent() throws Exception {
+        Mockito.when(kafkaTemplate.send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenThrow(new KafkaSendException());
+        InputStream inputStream = new ClassPathResource("posts/post1.json").getInputStream();
+        String postJson = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .lines().collect(Collectors.joining("\n"));
+        Post post = new ObjectMapper().readValue(postJson, Post.class);
+        postRepository.save(post);
+        inputStream = new ClassPathResource("posts/post2.json").getInputStream();
+        postJson = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .lines().collect(Collectors.joining("\n"));
+        mockMvc.perform(
+                put("/api/posts/1").contentType(MediaType.APPLICATION_JSON)
+                        .content(postJson)
+        ).andExpect(status().isInternalServerError());
+        postListener.getLatch().await(3, TimeUnit.SECONDS);
+        assertNull(postListener.getPayload());
+        post = postRepository.findById(1L).get();
+        assertEquals(post.getId(), 1L);
+        assertEquals(post.getTitle(), "post 1");
+        assertEquals(post.getBody(), "body of post 1");
+    }
+
+    @Test
+    public void deletePost_doesNotSaveToDatabaseWhenItFailsToEmitKafkaEvent() throws Exception {
+        Mockito.when(kafkaTemplate.send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenThrow(new KafkaSendException());
+        InputStream inputStream = new ClassPathResource("posts/post1.json").getInputStream();
+        String postJson = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .lines().collect(Collectors.joining("\n"));
+        Post post = new ObjectMapper().readValue(postJson, Post.class);
+        postRepository.save(post);
+        mockMvc.perform(
+                delete("/api/posts/1").contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isInternalServerError());
+        postListener.getLatch().await(3, TimeUnit.SECONDS);
+        assertNull(postListener.getPayload());
+        post = postRepository.findById(1L).get();
+        assertEquals(post.getId(), 1L);
+        assertEquals(post.getTitle(), "post 1");
+        assertEquals(post.getBody(), "body of post 1");
     }
 }
