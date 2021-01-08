@@ -14,4 +14,4 @@ jobs:
         java-version: 11
     - env:
         ACTIVE_PROFILE: test
-      run: cd posts && mvn --batch-mode --update-snapshots verify
+      run: cd posts && mvn verify
