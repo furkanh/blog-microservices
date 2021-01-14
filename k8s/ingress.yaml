@@ -22,3 +22,7 @@ spec:
             backend:
               serviceName: feed-service
               servicePort: 8080
+          - path: /?(.*)
+            backend:
+              serviceName: client-service
+              servicePort: 3000
