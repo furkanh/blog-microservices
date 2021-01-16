@@ -36,8 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(
         partitions = 1,
-        ports = {1292},
-        brokerProperties = { "listeners=PLAINTEXT://localhost:1292", "port=1292" },
+        bootstrapServersProperty = "spring.kafka.bootstrap-servers",
         topics = {"posts"}
 )
 @AutoConfigureMockMvc
