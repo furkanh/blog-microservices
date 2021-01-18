@@ -3,6 +3,8 @@ name: comments-test
 on:
   pull_request:
     branches: [ master ]
+  push:
+    branches: [ master ]
 
 jobs:
   run_tests:
@@ -17,6 +19,4 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
-    - env:
-        ACTIVE_PROFILE: test
-      run: cd comments && mvn -B test
+    - run: cd comments && mvn -B test
