@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const SiteNavbar = ({ setPostCreateVisible }) => {
+const SiteNavbar = ({ setPostCreateVisible, postCreateButtonVisible }) => {
   const createPost = (event) => {
     event.preventDefault();
     setPostCreateVisible(true);
@@ -11,9 +11,11 @@ const SiteNavbar = ({ setPostCreateVisible }) => {
       <div className="d-flex justify-content-end">
         <ul className="nav d-flex align-items-center">
           <li className="nav-item">
-            <button className="btn btn-primary" onClick={createPost}>
-              Create Post
-            </button>
+            { postCreateButtonVisible &&
+              <button className="btn btn-primary" onClick={createPost}>
+                Create Post
+              </button>
+            }
           </li>
         </ul>
       </div>

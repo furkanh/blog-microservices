@@ -5,13 +5,15 @@ import buildClient from '../api/build-client';
 
 const App = ({ Component, pageProps }) => {
   const [postCreateVisible, setPostCreateVisible] = useState(false);
+  const [postCreateButtonVisible, setPostCreateButtonVisible] = useState(false);
   return (
     <div>
-      <SiteNavbar setPostCreateVisible={setPostCreateVisible}/>
+      <SiteNavbar setPostCreateVisible={setPostCreateVisible} postCreateButtonVisible={postCreateButtonVisible}/>
       <Component
         {...pageProps}
         postCreateVisible={postCreateVisible}
         setPostCreateVisible={setPostCreateVisible}
+        setPostCreateButtonVisible={setPostCreateButtonVisible}
       />
     </div>
   );
