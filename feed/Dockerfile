@@ -1,6 +1,5 @@
 FROM maven:3-jdk-11 AS build
 WORKDIR /app
-ENV ACTIVE_PROFILE=test
 COPY ./ ./
 RUN mvn clean package
 
