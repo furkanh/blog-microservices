@@ -6,7 +6,7 @@ const CommentList = ({comments}) => {
       {comments && comments.length != 0 && comments.map(item => {
           return (
             <div key={item.id} className="row justify-content-md-center">
-              {item}
+              {item.body}
             </div>
           );
         })}

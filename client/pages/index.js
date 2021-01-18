@@ -2,10 +2,11 @@ import CreatePost from "../components/CreatePost";
 import IndexPostFeed from "../components/IndexPostFeed";
 
 
-const Index = ( { postCreateVisible, setPostCreateVisible, posts } ) => {
+const Index = ( { postCreateVisible, setPostCreateVisible, posts, setPostCreateButtonVisible} ) => {
   const style = {
     padding: "20px 10px 10px 10px"
   }
+  setPostCreateButtonVisible(true);
   return (
     <div className="container" style={style}>
       <div className="row justify-content-md-center">
